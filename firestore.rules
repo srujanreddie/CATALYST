@@ -1,0 +1,143 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string
+        && id.size() >= 1
+        && id.size() <= 128
+        && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedEmail() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerifiedEmail()
+        && (
+          request.auth.token.email == 'fokonarq@gmail.com'
+          || request.auth.token.email == 'gokasrujanreddy@gmail.com'
+        );
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin()
+        || (
+          isVerifiedEmail()
+          && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        );
+    }
+
+    // Strict Validation Blueprint synchronized verbatim with firebase-blueprint.json
+    function isValidInquiry(data) {
+      return data.keys().hasAll([
+          'referenceId',
+          'name',
+          'company',
+          'email',
+          'reason',
+          'details',
+          'status',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'referenceId',
+          'name',
+          'company',
+          'email',
+          'phone',
+          'reason',
+          'details',
+          'status',
+          'createdAt'
+        ])
+        && data.referenceId is string
+        && data.referenceId.size() == 10
+        && data.referenceId.matches('^CTY-[A-Z0-9]{6}$')
+        && data.name is string
+        && data.name.size() >= 2
+        && data.name.size() <= 120
+        && data.company is string
+        && data.company.size() <= 120
+        && data.email is string
+        && data.email.size() >= 5
+        && data.email.size() <= 180
+        && data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$')
+        && (
+          !('phone' in data)
+          || (
+            data.phone is string
+            && data.phone.size() <= 30
+            && (data.phone.size() == 0 || data.phone.matches('^[0-9+\\-\\s().]{7,30}$'))
+          )
+        )
+        && data.reason is string
+        && data.reason.size() >= 1
+        && data.reason.size() <= 120
+        && data.details is string
+        && data.details.size() >= 10
+        && data.details.size() <= 3000
+        && data.status is string
+        && data.status in ['new', 'reviewed', 'replied', 'archived']
+        && data.createdAt is timestamp;
+    }
+
+    // Public write-only submission, strictly admin-only PII read/triage/delete
+    match /inquiries/{inquiryId} {
+      allow create: if isValidId(inquiryId)
+        && isValidInquiry(incoming())
+        && incoming().status == 'new'
+        && incoming().createdAt == request.time;
+
+      allow get: if isValidId(inquiryId) && isAdmin();
+
+      // Zero get()/exists() DB reads inside list; restricted strictly to verified studio admins
+      allow list: if isBootstrappedAdmin();
+
+      // Action-based update: only verified admins can transition inquiry status; original fields are immutable
+      allow update: if isValidId(inquiryId)
+        && isValidInquiry(incoming())
+        && isAdmin()
+        && incoming().referenceId == existing().referenceId
+        && incoming().name == existing().name
+        && incoming().company == existing().company
+        && incoming().email == existing().email
+        && ((!('phone' in existing()) && !('phone' in incoming())) || (incoming().phone == existing().phone))
+        && incoming().reason == existing().reason
+        && incoming().details == existing().details
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+
+      allow delete: if isValidId(inquiryId) && isAdmin();
+    }
+
+    // Admin registry: read-own or bootstrapped admin only; no client-side self-promotion
+    match /admins/{adminUid} {
+      allow get: if isValidId(adminUid)
+        && isVerifiedEmail()
+        && (request.auth.uid == adminUid || isBootstrappedAdmin());
+
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+  }
+}

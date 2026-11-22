@@ -1,0 +1,106 @@
+{
+  "entities": {
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "A project inquiry submitted through the CATALYS public contact form and managed privately by studio admins.",
+      "type": "object",
+      "properties": {
+        "referenceId": {
+          "type": "string",
+          "description": "Unique human-readable studio inquiry reference ID.",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^CTY-[A-Z0-9]{6}$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the prospective client.",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "company": {
+          "type": "string",
+          "description": "Optional company or organization name.",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact email address of the sender.",
+          "minLength": 5,
+          "maxLength": 180,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Optional contact phone number provided by the sender.",
+          "minLength": 0,
+          "maxLength": 30,
+          "pattern": "^$|^[0-9+\\-\\s().]{7,30}$"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Selected project scope or inquiry category.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "details": {
+          "type": "string",
+          "description": "Project brief, goals, and timeline shared by the sender.",
+          "minLength": 10,
+          "maxLength": 3000
+        },
+        "status": {
+          "type": "string",
+          "description": "Workflow triage status of the inquiry.",
+          "enum": ["new", "reviewed", "replied", "archived"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server-generated Firestore timestamp when the inquiry was submitted."
+        }
+      },
+      "required": [
+        "referenceId",
+        "name",
+        "company",
+        "email",
+        "reason",
+        "details",
+        "status",
+        "createdAt"
+      ]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized CATALYS studio administrator marker document keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified administrator email address.",
+          "maxLength": 180
+        },
+        "role": {
+          "type": "string",
+          "description": "Administrator role label.",
+          "enum": ["admin"]
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/Inquiry" },
+      "description": "Publicly submittable (write-only), admin-managed collection of client project inquiries."
+    },
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Server/console-managed administrator allowlist keyed by Firebase Auth UID."
+    }
+  }
+}

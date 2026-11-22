@@ -1,0 +1,6 @@
+{
+  "name": "CATALYS",
+  "description": "CATALYS (CTY) — The design and engineering partner for founders, startups, and disruptors.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
