@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Footer } from './components/Footer';
+import { CursorGlow } from './components/MotionPrimitives';
 import { Navbar } from './components/Navbar';
 import { ProjectModal } from './components/ProjectModal';
 import type { Project } from './data/content';
@@ -15,6 +17,7 @@ import { WorkPage } from './pages/WorkPage';
 function AppShell() {
   const { pathname } = useRouter();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const renderPage = () => {
     switch (pathname) {
@@ -34,8 +37,21 @@ function AppShell() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#070709] text-white">
+      <CursorGlow />
       <Navbar />
-      <main className="flex-1">{renderPage()}</main>
+      <main className="flex-1">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={pathname}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {renderPage()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       <Footer />
       <ProjectModal
         project={selectedProject}

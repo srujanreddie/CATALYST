@@ -42,7 +42,20 @@ export function HomePage({ onSelectProject }: HomePageProps) {
     <div>
       {/* Hero Section */}
       <section className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 pt-14 pb-10 sm:pt-20 sm:pb-14">
-        <div className="max-w-5xl">
+        <motion.div
+          initial={
+            prefersReducedMotion
+              ? { opacity: 0 }
+              : { opacity: 0, y: 18, filter: 'blur(6px)' }
+          }
+          animate={
+            prefersReducedMotion
+              ? { opacity: 1 }
+              : { opacity: 1, y: 0, filter: 'blur(0px)' }
+          }
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-5xl"
+        >
           <h1 className="text-[clamp(2.25rem,5.2vw,4.5rem)] font-medium tracking-[-0.035em] leading-[1.08] text-white">
             <span>{siteConfig.heroPrefix} </span>
             <span className="inline-grid align-baseline">
@@ -52,7 +65,7 @@ export function HomePage({ onSelectProject }: HomePageProps) {
                   initial={
                     prefersReducedMotion
                       ? { opacity: 0 }
-                      : { opacity: 0, y: 12, filter: 'blur(8px)' }
+                      : { opacity: 0, y: 14, filter: 'blur(8px)' }
                   }
                   animate={
                     prefersReducedMotion
@@ -62,7 +75,7 @@ export function HomePage({ onSelectProject }: HomePageProps) {
                   exit={
                     prefersReducedMotion
                       ? { opacity: 0 }
-                      : { opacity: 0, y: -12, filter: 'blur(8px)' }
+                      : { opacity: 0, y: -14, filter: 'blur(8px)' }
                   }
                   transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
                   className="col-start-1 row-start-1 inline-block text-white"
@@ -72,16 +85,21 @@ export function HomePage({ onSelectProject }: HomePageProps) {
               </AnimatePresence>
             </span>
           </h1>
-        </div>
+        </motion.div>
 
         {/* Featured Work Showcase: Zero empty slots; adapts cleanly to project count */}
         {featuredProjects.length === 1 && (
-          <div className="mt-10 sm:mt-14">
+          <motion.div
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-10 sm:mt-14"
+          >
             <FeaturedProjectSpotlight
               project={featuredProjects[0]}
               onSelect={onSelectProject}
             />
-          </div>
+          </motion.div>
         )}
 
         {featuredProjects.length > 1 && (
@@ -89,11 +107,26 @@ export function HomePage({ onSelectProject }: HomePageProps) {
             <div
               className={`flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory no-scrollbar lg:grid ${getResponsiveGridClass(
                 featuredProjects.length
-              )} lg:gap-4 lg:overflow-visible lg:pb-0`}
+              )} lg:gap-5 lg:overflow-visible lg:pb-0`}
             >
-              {featuredProjects.map((project) => (
-                <div
+              {featuredProjects.map((project, index) => (
+                <motion.div
                   key={project.id}
+                  initial={
+                    prefersReducedMotion
+                      ? { opacity: 0 }
+                      : { opacity: 0, y: 26, filter: 'blur(6px)' }
+                  }
+                  animate={
+                    prefersReducedMotion
+                      ? { opacity: 1 }
+                      : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                  }
+                  transition={{
+                    duration: 0.55,
+                    delay: 0.08 + index * 0.09,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                   className="w-[78vw] sm:w-[44vw] md:w-[32vw] lg:w-auto shrink-0 snap-start"
                 >
                   <ProjectCard
@@ -105,7 +138,7 @@ export function HomePage({ onSelectProject }: HomePageProps) {
                         : 'aspect-[4/5]'
                     }
                   />
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

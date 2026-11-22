@@ -1,9 +1,12 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { reviews, siteConfig } from '../data/content';
 import { getSafeExternalHref, Link } from '../lib/router';
 import { Monogram } from './Monogram';
+import { Magnetic } from './MotionPrimitives';
 
 export function Footer() {
+  const prefersReducedMotion = useReducedMotion();
   const hasReviews = reviews.length > 0;
   const activeSocials = siteConfig.socials
     .map((social) => ({
@@ -18,22 +21,43 @@ export function Footer() {
     <footer className="w-full bg-[#070709] border-t border-white/[0.06]">
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 pt-16 pb-12 sm:pt-20 sm:pb-14">
         <div className="flex flex-col justify-between gap-14 lg:flex-row lg:items-end">
-          {/* Left: Oversized stacked brand typography (first letter pure white, remainder muted gray) */}
+          {/* Left: Oversized stacked brand typography with staggered kinetic rise */}
           <div className="select-none">
             <Link
               to="/"
               aria-label={siteConfig.name}
-              className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-sm"
+              className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-sm"
             >
               <div className="flex flex-col leading-[0.94] tracking-[-0.04em] font-semibold text-[clamp(3.25rem,8vw,6.25rem)]">
-                {siteConfig.footerBrandLines.map((line) => {
+                {siteConfig.footerBrandLines.map((line, index) => {
                   const firstChar = line.slice(0, 1);
                   const restChars = line.slice(1);
                   return (
-                    <span key={line} className="block">
+                    <motion.span
+                      key={line}
+                      initial={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: 24, filter: 'blur(6px)' }
+                      }
+                      whileInView={
+                        prefersReducedMotion
+                          ? { opacity: 1 }
+                          : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                      }
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{
+                        duration: 0.55,
+                        delay: index * 0.08,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                      className="block"
+                    >
                       <span className="text-white">{firstChar}</span>
-                      <span className="text-[#3A3A40]">{restChars}</span>
-                    </span>
+                      <span className="text-[#3A3A40] transition-colors duration-300 group-hover:text-[#55555e]">
+                        {restChars}
+                      </span>
+                    </motion.span>
                   );
                 })}
               </div>
@@ -124,18 +148,20 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Bottom-right monogram & quiet copyright */}
+            {/* Bottom-right magnetic monogram & quiet copyright */}
             <div className="flex items-center justify-between pt-4 border-t border-white/[0.06] lg:border-none lg:pt-0 lg:justify-end lg:gap-6">
               <span className="text-xs text-[#66666E]">
                 © {new Date().getFullYear()} {siteConfig.name}
               </span>
-              <Link
-                to="/"
-                aria-label={`${siteConfig.name} Monogram`}
-                className="text-white/90 hover:text-white transition-colors"
-              >
-                <Monogram className="h-5 w-auto" />
-              </Link>
+              <Magnetic strength={0.3} maxOffset={8}>
+                <Link
+                  to="/"
+                  aria-label={`${siteConfig.name} Monogram`}
+                  className="text-white/90 hover:text-white transition-colors p-1"
+                >
+                  <Monogram className="h-5 w-auto" />
+                </Link>
+              </Magnetic>
             </div>
           </div>
         </div>

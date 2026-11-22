@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AlertCircle, Check, Copy, Loader2, Mail } from 'lucide-react';
 import { ClientLogoMarquee } from '../components/EditorialSections';
+import { Magnetic } from '../components/MotionPrimitives';
 import { StartProjectBanner } from '../components/StartProjectBanner';
 import { clientLogos, services, siteConfig } from '../data/content';
 import {
@@ -473,20 +474,22 @@ export function ContactPage() {
                   </div>
 
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-[#070709] transition-colors duration-150 hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111114]"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                          <span>Sending...</span>
-                        </>
-                      ) : (
-                        <span>Send Message</span>
-                      )}
-                    </button>
+                    <Magnetic strength={0.24} maxOffset={9}>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-[#070709] transition-colors duration-150 hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111114]"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                            <span>Sending...</span>
+                          </>
+                        ) : (
+                          <span>Send Message</span>
+                        )}
+                      </button>
+                    </Magnetic>
 
                     <p className="text-xs text-[#888888]">
                       Direct inquiries go to{' '}

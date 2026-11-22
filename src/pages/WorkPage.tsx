@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { FeaturedProjectSpotlight, ProjectCard } from '../components/ProjectCard';
 import { StartProjectBanner } from '../components/StartProjectBanner';
 import { projects, siteConfig, type Project } from '../data/content';
@@ -15,6 +16,7 @@ function getWorkGridClass(count: number): string {
 
 export function WorkPage({ onSelectProject }: WorkPageProps) {
   const [selectedTag, setSelectedTag] = useState<string>('All');
+  const prefersReducedMotion = useReducedMotion();
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -33,14 +35,26 @@ export function WorkPage({ onSelectProject }: WorkPageProps) {
     <div>
       <section className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 pt-14 pb-16 sm:pt-20 sm:pb-24">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div>
+          <motion.div
+            initial={
+              prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 16, filter: 'blur(6px)' }
+            }
+            animate={
+              prefersReducedMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, filter: 'blur(0px)' }
+            }
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          >
             <p className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500">
               Selected Works
             </p>
             <h1 className="mt-4 text-[clamp(2.25rem,5vw,4.25rem)] font-medium tracking-[-0.035em] leading-[1.06] text-white">
               {siteConfig.workHeadline}
             </h1>
-          </div>
+          </motion.div>
 
           {showFilters && (
             <div
@@ -71,29 +85,52 @@ export function WorkPage({ onSelectProject }: WorkPageProps) {
           )}
         </div>
 
-        {/* Real Selected Works with zero empty placeholder cards */}
+        {/* Real Selected Works with staggered 3D card reveals */}
         {filteredProjects.length === 1 && (
-          <div className="mt-12">
+          <motion.div
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 22 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-12"
+          >
             <FeaturedProjectSpotlight
               project={filteredProjects[0]}
               onSelect={onSelectProject}
             />
-          </div>
+          </motion.div>
         )}
 
         {filteredProjects.length > 1 && (
           <div className={`mt-12 grid grid-cols-1 gap-5 ${getWorkGridClass(filteredProjects.length)}`}>
-            {filteredProjects.map((project) => (
-              <ProjectCard
+            {filteredProjects.map((project, index) => (
+              <motion.div
                 key={project.id}
-                project={project}
-                onSelect={onSelectProject}
-                aspectClass={
-                  filteredProjects.length === 2
-                    ? 'aspect-[4/5] sm:aspect-[16/11]'
-                    : 'aspect-[4/5]'
+                initial={
+                  prefersReducedMotion
+                    ? { opacity: 0 }
+                    : { opacity: 0, y: 24, filter: 'blur(6px)' }
                 }
-              />
+                animate={
+                  prefersReducedMotion
+                    ? { opacity: 1 }
+                    : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                }
+                transition={{
+                  duration: 0.5,
+                  delay: 0.06 + index * 0.08,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <ProjectCard
+                  project={project}
+                  onSelect={onSelectProject}
+                  aspectClass={
+                    filteredProjects.length === 2
+                      ? 'aspect-[4/5] sm:aspect-[16/11]'
+                      : 'aspect-[4/5]'
+                  }
+                />
+              </motion.div>
             ))}
           </div>
         )}

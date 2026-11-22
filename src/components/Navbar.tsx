@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { reviews, siteConfig } from '../data/content';
 import { Link, useRouter } from '../lib/router';
 import { Monogram } from './Monogram';
+import { Magnetic, ScrollProgressLine } from './MotionPrimitives';
 
 export function Navbar() {
   const { pathname } = useRouter();
@@ -55,7 +56,7 @@ export function Navbar() {
                 {isActive && (
                   <motion.span
                     layoutId="navbar-active-indicator"
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                     className="absolute inset-x-0 bottom-0 h-[2px] bg-white"
                   />
                 )}
@@ -79,29 +80,36 @@ export function Navbar() {
 
         {/* Zone 2 (Center): Minimalist Geometric Monogram Logo */}
         <div className="flex shrink-0 items-center justify-center">
-          <Link
-            to="/"
-            aria-label={`${siteConfig.name} Home`}
-            className="group inline-flex items-center justify-center py-1 text-white transition-opacity duration-150 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-sm"
-          >
-            <Monogram className="h-7 w-auto" />
-          </Link>
+          <Magnetic strength={0.25} maxOffset={8}>
+            <Link
+              to="/"
+              aria-label={`${siteConfig.name} Home`}
+              className="group inline-flex items-center justify-center py-1 px-2 text-white transition-opacity duration-150 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-sm"
+            >
+              <Monogram className="h-7 w-auto" />
+            </Link>
+          </Magnetic>
         </div>
 
         {/* Zone 3 (Right): Primary Action CTA */}
         <div className="flex flex-1 items-center justify-end shrink-0">
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-1.5 py-2 text-sm font-medium text-white whitespace-nowrap shrink-0 transition-opacity duration-150 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-sm"
-          >
-            <span>Start a Project</span>
-            <ArrowUpRight
-              className="h-4 w-4 text-neutral-400 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white"
-              aria-hidden="true"
-            />
-          </Link>
+          <Magnetic strength={0.26} maxOffset={10}>
+            <Link
+              to="/contact"
+              className="group inline-flex items-center gap-1.5 py-2 px-1 text-sm font-medium text-white whitespace-nowrap shrink-0 transition-opacity duration-150 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-sm"
+            >
+              <span>Start a Project</span>
+              <ArrowUpRight
+                className="h-4 w-4 text-neutral-400 transition-transform duration-150 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white"
+                aria-hidden="true"
+              />
+            </Link>
+          </Magnetic>
         </div>
       </div>
+
+      {/* Scroll-linked white progress hairline */}
+      <ScrollProgressLine />
 
       {/* Mobile Navigation Drawer */}
       <AnimatePresence>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import { useInView, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import {
   clientLogos,
   metrics,
@@ -11,6 +11,7 @@ import {
   type Review,
 } from '../data/content';
 import { Link } from '../lib/router';
+import { ScrollReveal } from './MotionPrimitives';
 
 /**
  * 1. Client Logo Marquee (strictly hidden when `clientLogos` is empty)
@@ -68,40 +69,47 @@ export function SolutionsSection() {
       aria-labelledby="solutions-heading"
       className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 py-20 sm:py-28"
     >
-      <p
-        id="solutions-heading"
-        className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-10 sm:mb-14"
-      >
-        Solutions
-      </p>
+      <ScrollReveal>
+        <p
+          id="solutions-heading"
+          className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-10 sm:mb-14"
+        >
+          Solutions
+        </p>
+      </ScrollReveal>
 
       <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
-        {services.map((category) => (
-          <div
-            key={category.id}
-            className="grid grid-cols-1 gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:items-start lg:gap-12"
-          >
-            {/* Left: Large bold category title */}
-            <div className="lg:col-span-5">
-              <h2 className="text-[clamp(2.25rem,4.5vw,4rem)] font-semibold tracking-[-0.03em] leading-[1.05] text-white">
-                {category.title}
-              </h2>
-            </div>
+        {services.map((category, index) => (
+          <ScrollReveal key={category.id} delay={index * 0.08}>
+            <div className="group relative grid grid-cols-1 gap-8 py-12 sm:py-16 lg:grid-cols-12 lg:items-start lg:gap-12 transition-colors duration-300">
+              {/* Hover-reactive hairline light sweep */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[1px] origin-left scale-x-0 bg-gradient-to-r from-white/70 via-white/30 to-transparent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100"
+              />
 
-            {/* Right: 2-column deliverables list */}
-            <div className="lg:col-span-7 lg:pt-2">
-              <ul className="grid grid-cols-1 gap-x-10 gap-y-3.5 sm:grid-cols-2">
-                {category.deliverables.map((item) => (
-                  <li
-                    key={item}
-                    className="text-sm sm:text-[15px] leading-relaxed text-neutral-300"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              {/* Left: Large bold category title */}
+              <div className="lg:col-span-5">
+                <h2 className="text-[clamp(2.25rem,4.5vw,4rem)] font-semibold tracking-[-0.03em] leading-[1.05] text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">
+                  {category.title}
+                </h2>
+              </div>
+
+              {/* Right: 2-column deliverables list */}
+              <div className="lg:col-span-7 lg:pt-2">
+                <ul className="grid grid-cols-1 gap-x-10 gap-y-3.5 sm:grid-cols-2">
+                  {category.deliverables.map((item) => (
+                    <li
+                      key={item}
+                      className="text-sm sm:text-[15px] leading-relaxed text-neutral-300 transition-colors duration-200 group-hover:text-white"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         ))}
       </div>
     </section>
@@ -153,15 +161,21 @@ export function ManifestoAndPillarsSection() {
         className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 py-20 sm:py-28"
       >
         <div className="mx-auto max-w-4xl">
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-8">
-            {siteConfig.manifestoEyebrow}
-          </p>
-          <p className="text-[clamp(1.625rem,3.4vw,2.75rem)] font-medium tracking-[-0.025em] leading-[1.24] text-white">
-            {siteConfig.manifestoLead}
-          </p>
-          <p className="mt-8 text-[clamp(1.125rem,2vw,1.5rem)] font-normal leading-[1.55] text-[#888888]">
-            {siteConfig.manifestoBody}
-          </p>
+          <ScrollReveal>
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-8">
+              {siteConfig.manifestoEyebrow}
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.07}>
+            <p className="text-[clamp(1.625rem,3.4vw,2.75rem)] font-medium tracking-[-0.025em] leading-[1.24] text-white">
+              {siteConfig.manifestoLead}
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.14}>
+            <p className="mt-8 text-[clamp(1.125rem,2vw,1.5rem)] font-normal leading-[1.55] text-[#888888]">
+              {siteConfig.manifestoBody}
+            </p>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -170,12 +184,14 @@ export function ManifestoAndPillarsSection() {
         aria-labelledby="pillars-heading"
         className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12 py-20 sm:py-32 border-t border-white/[0.06]"
       >
-        <p
-          id="pillars-heading"
-          className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-10 sm:mb-14"
-        >
-          {siteConfig.pillarsEyebrow}
-        </p>
+        <ScrollReveal>
+          <p
+            id="pillars-heading"
+            className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-500 mb-10 sm:mb-14"
+          >
+            {siteConfig.pillarsEyebrow}
+          </p>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-start">
           {/* Left: Giant display pillar words with blur/opacity focus */}
@@ -195,7 +211,7 @@ export function ManifestoAndPillarsSection() {
                   aria-pressed={isActive}
                   className={`text-left font-semibold tracking-[-0.04em] leading-[1.02] text-[clamp(3rem,8.5vw,6.75rem)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 rounded-sm ${
                     isActive
-                      ? 'text-white opacity-100 blur-0 translate-x-0'
+                      ? 'text-white opacity-100 blur-0 translate-x-2'
                       : prefersReducedMotion
                         ? 'text-white opacity-25'
                         : 'text-white opacity-25 blur-[3px] hover:opacity-55 hover:blur-[1px]'
@@ -207,15 +223,36 @@ export function ManifestoAndPillarsSection() {
             })}
           </div>
 
-          {/* Right: Sticky synchronized philosophy copy */}
+          {/* Right: Sticky synchronized philosophy copy with smooth swap */}
           <div className="lg:col-span-5 lg:sticky lg:top-32 lg:pt-4">
             <div className="max-w-md border-t border-white/[0.08] pt-6 lg:border-t-0 lg:pt-0">
               <p className="font-mono text-xs text-neutral-500 tabular-nums mb-4">
                 0{activePillarIndex + 1} / 0{siteConfig.pillars.length}
               </p>
-              <p className="text-base sm:text-lg leading-relaxed text-neutral-300">
-                {activePillar.description}
-              </p>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.p
+                  key={activePillar.id}
+                  initial={
+                    prefersReducedMotion
+                      ? { opacity: 0 }
+                      : { opacity: 0, y: 10, filter: 'blur(4px)' }
+                  }
+                  animate={
+                    prefersReducedMotion
+                      ? { opacity: 1 }
+                      : { opacity: 1, y: 0, filter: 'blur(0px)' }
+                  }
+                  exit={
+                    prefersReducedMotion
+                      ? { opacity: 0 }
+                      : { opacity: 0, y: -8, filter: 'blur(4px)' }
+                  }
+                  transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-base sm:text-lg leading-relaxed text-neutral-300"
+                >
+                  {activePillar.description}
+                </motion.p>
+              </AnimatePresence>
             </div>
           </div>
         </div>
